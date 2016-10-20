@@ -1,12 +1,14 @@
 package httpfs;
 
 import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 public class RequestParser {
 
 	ArrayList<String> fullRequest;
 	String method;
 	String path;
+	String file;
 	String host;
 	int port;
 	String contentLength;
@@ -20,16 +22,18 @@ public class RequestParser {
 	
 	public void parse(){
 		extractHostAndPort();
-		extractMethodAndPath();
+		extractMethodAndPathAndFile();
 		if(method.equals("POST")){
 			extractPostHeadersAndBody();
 		}
 	}
 	
-	void extractMethodAndPath() {
-		String[] temp = fullRequest.get(0).split(" ", 3);
-		method = temp[0];
-		path = temp[1];
+	void extractMethodAndPathAndFile() {
+		String[] firstLine = fullRequest.get(0).split(" ", 3);
+		method = firstLine[0];
+		path = firstLine[1];
+		String[] extractFile = path.split("/");
+		file = extractFile[extractFile.length - 1];
 	}
 	
 	void extractHostAndPort() {
@@ -63,6 +67,7 @@ public class RequestParser {
 		System.out.println("Method: " + method);
 		System.out.println("Path: " + path);
 		System.out.println("Host: " + host);
+		System.out.println("File " + file);
 		System.out.println("Port " + port);
 		System.out.println("Content-Length: " + contentLength);
 		System.out.println("Content-Type: " + contentType);
