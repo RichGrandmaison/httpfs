@@ -14,6 +14,9 @@ public class CommandLineParser {
 		this.args = new ArrayList<String>(Arrays.asList(args));	
 	}
 
+	//Parse the arguments from the command line. We count the number of arguments
+	//The acceptable parameters are -v, -p and -d
+	//At the end of the parsing process, if the number of arguments is greater than 1, we have a problem
 	public void parse(){
 		int argsLength = args.size();
 		if(args.contains(DEBUGMESSAGES)){

@@ -28,6 +28,7 @@ public class RequestParser {
 		}
 	}
 	
+	//obtain the Request Method, the path to the file, and the file name
 	void extractMethodAndPathAndFile() {
 		String[] firstLine = fullRequest.get(0).split(" ", 3);
 		method = firstLine[0];
@@ -36,6 +37,7 @@ public class RequestParser {
 		file = extractFile[extractFile.length - 1];
 	}
 	
+	//obtain the host name, and if it port number is specified, capture it.
 	void extractHostAndPort() {
 		String[] fullHost = fullRequest.get(1).split(" ", 2);
 		String[] splitHost = fullHost[1].split(":", 2);
@@ -45,6 +47,7 @@ public class RequestParser {
 		else port = Httpfs.port;
 	}
 	
+	//obtain the headers and the body associated with a POST request
 	void extractPostHeadersAndBody(){
 		boolean bodyStarts = false;
 		
@@ -63,6 +66,7 @@ public class RequestParser {
 		}
 	}
 	
+	//Only for testing purposes
 	public void DisplayParsedRequest(){
 		System.out.println("Method: " + method);
 		System.out.println("Path: " + path);
