@@ -48,13 +48,14 @@ public class Httpfs {
 			
 			RequestParser rp = new RequestParser(fullRequest);
 			rp.parse();
-			
+			rp.DisplayParsedRequest();
 			
 			
 			//close all
+			/*
 			request.close();
 			response.close();
-			clientSocket.close();
+			clientSocket.close();*/
 		}
 	}
 }
