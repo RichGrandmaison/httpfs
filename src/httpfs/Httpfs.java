@@ -27,21 +27,7 @@ public class Httpfs {
 		if(debugMessages){
 			System.out.println("Debug messages will be printed ...");
 		}
-		
-		ArrayList<String> testPost = new ArrayList<String>();
-		testPost.add("POST /path/script.cgi HTTP/1.0\r\n");
-		testPost.add("From: frog@jmarshall.com");
-		testPost.add("User-Agent: HTTPTool/1.0\r\n");
-		testPost.add("Content-Type: application/x-www-form-urlencoded\r\n");
-		testPost.add("Content-Length: 32");
-		testPost.add("\r\n");
-		testPost.add("home=Cosby&favorite+flavor=flies\r\n");
-		
-		RequestParser rp = new RequestParser(testPost);
-		rp.parse();
-		rp.DisplayParsedRequest();
 
-		/*
 		//wait for connections
 		while(true){
 			Socket clientSocket = serverSocket.accept();
@@ -61,12 +47,14 @@ public class Httpfs {
 			}
 			
 			RequestParser rp = new RequestParser(fullRequest);
+			rp.parse();
+			
 			
 			
 			//close all
 			request.close();
 			response.close();
 			clientSocket.close();
-		}*/
+		}
 	}
 }

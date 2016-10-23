@@ -1,5 +1,8 @@
 package httpfs;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
@@ -11,7 +14,7 @@ public class RequestParser {
 	String file;
 	String host;
 	int port;
-	String contentLength;
+	int contentLength;
 	String contentType;
 	StringBuilder postBody;
 	
@@ -20,12 +23,26 @@ public class RequestParser {
 		postBody = new StringBuilder();
 	}
 	
-	public void parse(){
+	public void parse() throws IOException{
 		extractHostAndPort();
 		extractMethodAndPathAndFile();
 		if(method.equals("POST")){
 			extractPostHeadersAndBody();
+			if(!checkIfContentLengthIsValid()){
+				System.err.println("Invalid content-length");
+				//Handle error here
+			}
+			servePOST();
 		}
+	}
+	
+	//Create a file at the correct location. If the directories do not exist, create them
+	void servePOST() throws IOException{
+		File file = new File(Httpfs.pathToDir + path);
+		file.getParentFile().mkdirs();
+		FileWriter fw = new FileWriter(file);
+		fw.write(postBody.toString());
+		fw.close();
 	}
 	
 	//obtain the Request Method, the path to the file, and the file name
@@ -54,16 +71,32 @@ public class RequestParser {
 		for(String requestLine : fullRequest){
 			if(requestLine.startsWith("Content-Length")){
 				String[] temp = requestLine.split(": ");
-				contentLength = temp[1];
+				contentLength = Integer.parseInt(temp[1]);
 			} else if(requestLine.startsWith("Content-Type")){
 				String[] temp = requestLine.split(": ");
 				contentType = temp[1];
 			} else if(requestLine.equals("\r\n")){
 				bodyStarts = true;
 			} else if(bodyStarts){
+				if(requestLine.contains("\r\n")){
+					postBody.append(requestLine.subSequence(0, requestLine.length() - 2));
+				} else {
 				postBody.append(requestLine);
+				}
 			}
 		}
+	}
+	
+	boolean checkIfContentLengthIsValid(){
+		return (contentLength == postBody.length()) ? true : false;
+	}
+	
+	boolean checkRequestCorrectness() {
+		boolean isValid = false;
+		//if(!(method.equalsIgnoreCase("post") || method.equalsIgnoreCase("get")))
+			
+			
+		return isValid;
 	}
 	
 	//Only for testing purposes
