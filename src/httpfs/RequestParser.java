@@ -17,6 +17,7 @@ public class RequestParser {
 	int contentLength;
 	String contentType;
 	StringBuilder postBody;
+	int statusCode;
 	
 	public RequestParser(ArrayList<String> fr){
 		this.fullRequest = fr;
@@ -26,18 +27,15 @@ public class RequestParser {
 	public void parse() throws IOException{
 		extractHostAndPort();
 		extractMethodAndPathAndFile();
-		System.err.println("Parsing...");
-		System.out.println("Parsing...");
 		if(method.equals("POST")){
 			extractPostHeadersAndBody();
 			if(!checkIfContentLengthIsValid()){
 				System.err.println("Invalid content-length");
-				//Handle error here
+				statusCode = 411;
 			}
 		}
 		if(checkRequestCorrectness()){
-			//MAKE ResponseParser here
-			System.err.println("Request is Valid!");
+			statusCode = 200;
 		}
 	}
 	
@@ -64,7 +62,6 @@ public class RequestParser {
 		String[] fullHost = fullRequest.get(1).split(" ", 2);
 		String[] splitHost = fullHost[1].split(":", 2);
 		host = splitHost[0];
-		System.err.println(host);
 		if(splitHost.length > 1)
 			port = Integer.parseInt(splitHost[1]);
 		else port = Httpfs.port;
@@ -102,12 +99,18 @@ public class RequestParser {
 			return false;
 		} if(method.equalsIgnoreCase("get")){ //check if requestedFile exists
 			File requestedFile = new File(Httpfs.pathToDir + path);
-			if(!requestedFile.exists())
+			System.out.println(requestedFile.getAbsolutePath());
+			if(!requestedFile.exists()){
+				statusCode = 404;
 				return false;
+			}
 		} else if(method.equalsIgnoreCase("post")){
 			File requestedFile = new File(Httpfs.pathToDir + path);
-			if(requestedFile.isDirectory()) //check if file is not a directory
+			if(requestedFile.isDirectory()){ //check if file is not a directory
+				statusCode = 404;
 				return false;
+			}
+				
 		} 
 		return true;
 	}
