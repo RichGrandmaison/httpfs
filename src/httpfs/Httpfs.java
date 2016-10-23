@@ -44,12 +44,17 @@ public class Httpfs {
 			while((requestLine = request.readLine()) != null){
 				System.err.println(requestLine);
 				fullRequest.add(requestLine);
+				if(requestLine.isEmpty())
+				{
+					break;
+				}
 			}
 			
 			RequestParser rp = new RequestParser(fullRequest);
 			rp.parse();
 			rp.DisplayParsedRequest();
 			
+			System.err.println("wat");
 			
 			//close all
 			/*
