@@ -37,6 +37,9 @@ public class RequestParser {
 				statusCode = 411;
 			} else {
 				File requestedFile = new File(Httpfs.pathToDir + path);
+				if(!requestedFile.exists()){
+					requestedFile.getParentFile().mkdirs();
+				}
 				FileWriter fw = new FileWriter(requestedFile);
 				fw.write(postBody.toString());
 				fw.flush();
