@@ -51,7 +51,7 @@ public class RequestParser {
 	//obtain the Request Method, the path to the file, and the file name
 	void extractMethodAndPathAndFile() {
 		String[] firstLine = fullRequest.get(0).split(" ", 3);
-		method = firstLine[0];
+		method = firstLine[0].toUpperCase();
 		path = firstLine[1];
 		String[] extractFile = path.split("/");
 		file = extractFile[extractFile.length - 1];

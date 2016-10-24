@@ -7,26 +7,43 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class ReponseParser {
+public class ResponseParser {
 
 	private RequestParser rp;
 	private int contentLength;
 	private String httpHeader;
-	private String contentType = "text/html";
+	private String contentType = "text/plain";
 	private String content;
 	private String dateNow;
 	private String modifiedDate;
 	private String server = "Rich&Simon =D v1";
+	private String finalResponse;
 	
-	public ReponseParser(RequestParser r)
+	public ResponseParser(RequestParser r)
 	{
 		rp = r;
-		
 		httpHeader = GetHTTPMessage();
-		content = GetContent(r.file);
-		contentLength = content.length();
+
 		dateNow = new Date().toString();
-		modifiedDate = GetModifiedDate(r.file);		
+		modifiedDate = GetModifiedDate(r.path);		
+		
+		String response = "";
+		response += httpHeader + "\n";
+		response += "Date: " + dateNow;
+		response += "\nServer: " + server;
+		
+		if(r.method.equals("GET"))
+		{	
+			content = GetContent(r.path);
+			contentLength = content.length();
+			response += "\nMIME-version: 1.0";
+			response += "\nLast-Modified: " + modifiedDate;
+			response += "\nContent-Type: " + contentType;
+			response += "\nContent-Length " + contentLength;
+			response += "\n\n" + content;	
+		}
+
+		finalResponse = response;
 	}
 	
 	public String GetResponse()
@@ -40,7 +57,7 @@ public class ReponseParser {
 	{
 		int statusCode  = 200;
 	
-		String toReturn = "HTTP/1.1 "+statusCode +" "+ HttpStatusCode.codes.get(statusCode);
+		String toReturn = "HTTP/1.0 "+statusCode +" "+ HttpStatusCode.codes.get(statusCode);
 		
 		return toReturn;
 	}

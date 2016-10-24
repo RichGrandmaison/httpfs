@@ -1,0 +1,9 @@
+diff a/src/httpfs/Httpfs.java b/src/httpfs/Httpfs.java	(rejected hunks)
+@@ -48,6 +48,7 @@
+ 			
+ 			RequestParser rp = new RequestParser(fullRequest);
+ 			rp.parse();
++			rp.DisplayParsedRequest();
+ 			
+ 			
+ 			//close all
