@@ -40,7 +40,9 @@ public class Httpfs {
 			
 			String requestLine;
 			ArrayList<String> fullRequest = new ArrayList<String>();
-			
+			int contentLength = -1;
+			final String contentLengthString = "Content-Length: ";
+			/*
 			while((requestLine = request.readLine()) != null){
 				System.err.println(requestLine);
 				fullRequest.add(requestLine);
@@ -48,7 +50,25 @@ public class Httpfs {
 				{
 					break;
 				}
+			}*/
+			while(true){
+				requestLine = request.readLine();
+				System.err.println(requestLine);
+				fullRequest.add(requestLine);
+				if(requestLine.startsWith(contentLengthString)){
+					contentLength = Integer.parseInt(requestLine.substring(
+							contentLengthString.length()));
+				}
+				if(requestLine.length() == 0){
+					break;
+				}
 			}
+			
+			final char[] postContent = new char[contentLength];
+			request.read(postContent);
+			System.err.println(postContent);
+			fullRequest.add(new String(postContent));
+			
 			
 			RequestParser rp = new RequestParser(fullRequest);
 			rp.parse();

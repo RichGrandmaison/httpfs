@@ -16,12 +16,12 @@ public class RequestParser {
 	int port;
 	int contentLength;
 	String contentType;
-	StringBuilder postBody;
+	String postBody;
 	int statusCode; //ok
 	
 	public RequestParser(ArrayList<String> fr){
 		this.fullRequest = fr;
-		postBody = new StringBuilder();
+		postBody = new String();
 	}
 	
 	public void parse() throws IOException{
@@ -69,7 +69,6 @@ public class RequestParser {
 	
 	//obtain the headers and the body associated with a POST request
 	void extractPostHeadersAndBody(){
-		boolean bodyStarts = false;
 		
 		for(String requestLine : fullRequest){
 			if(requestLine.startsWith("Content-Length")){
@@ -78,16 +77,9 @@ public class RequestParser {
 			} else if(requestLine.startsWith("Content-Type")){
 				String[] temp = requestLine.split(": ");
 				contentType = temp[1];
-			} else if(requestLine.equals("\r\n")){
-				bodyStarts = true;
-			} else if(bodyStarts){
-				if(requestLine.contains("\r\n")){
-					postBody.append(requestLine.subSequence(0, requestLine.length() - 2));
-				} else {
-				postBody.append(requestLine);
-				}
-			}
+			} 
 		}
+		postBody = fullRequest.get(fullRequest.size() - 1);
 	}
 	
 	boolean checkIfContentLengthIsValid(){
