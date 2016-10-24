@@ -26,7 +26,8 @@ public class CommandLineParser {
 		}
 		if(args.contains(PATHTODIR)){
 			Httpfs.pathToDir = args.get(args.indexOf(PATHTODIR) + 1);
-			argsLength -= 2;
+			boolean requestedPath = new File(Httpfs.pathToDir).mkdirs();
+			argsLength -= 2;	
 		}
 		if(args.contains(PORT)) {
 			Httpfs.port = Integer.parseInt(args.get(args.indexOf(PORT) + 1));
