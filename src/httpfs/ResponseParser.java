@@ -22,7 +22,7 @@ public class ResponseParser {
 	public ResponseParser(RequestParser r)
 	{
 		rp = r;
-		httpHeader = GetHTTPMessage();
+		httpHeader = GetHTTPMessage(r.statusCode);
 
 		dateNow = new Date().toString();
 		modifiedDate = GetModifiedDate(r.path);		
@@ -53,12 +53,9 @@ public class ResponseParser {
 		return toReturn;
 	}
 	
-	private String GetHTTPMessage()
+	private String GetHTTPMessage(int statusCode)
 	{
-		int statusCode  = 200;
-	
 		String toReturn = "HTTP/1.0 "+statusCode +" "+ HttpStatusCode.codes.get(statusCode);
-		
 		return toReturn;
 	}
 	
