@@ -17,7 +17,7 @@ public class RequestParser {
 	int contentLength;
 	String contentType;
 	StringBuilder postBody;
-	int statusCode;
+	int statusCode; //ok
 	
 	public RequestParser(ArrayList<String> fr){
 		this.fullRequest = fr;
