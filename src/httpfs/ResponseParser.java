@@ -17,49 +17,42 @@ public class ResponseParser {
 	private String dateNow;
 	private String modifiedDate;
 	private String server = "Rich&Simon =D v1";
-	private String finalResponse;
+	public String finalResponse;
 	
 	public ResponseParser(RequestParser r)
 	{
 		rp = r;
-		httpHeader = GetHTTPMessage(r.statusCode);
+		httpHeader = getHTTPMessage(r.statusCode);
 
 		dateNow = new Date().toString();
-		modifiedDate = GetModifiedDate(r.path);		
+		modifiedDate = getModifiedDate(Httpfs.pathToDir + r.path);		
 		
 		String response = "";
-		response += httpHeader + "\n";
+		response += httpHeader + "\r\n";
 		response += "Date: " + dateNow;
-		response += "\nServer: " + server;
+		response += "\r\nServer: " + server;
 		
 		if(r.method.equals("GET"))
 		{	
-			content = GetContent(r.path);
+			content = getContent(Httpfs.pathToDir + r.path);
 			contentLength = content.length();
-			response += "\nMIME-version: 1.0";
-			response += "\nLast-Modified: " + modifiedDate;
-			response += "\nContent-Type: " + contentType;
-			response += "\nContent-Length " + contentLength;
-			response += "\n\n" + content;	
+			response += "\r\nMIME-version: 1.0";
+			response += "\r\nLast-Modified: " + modifiedDate;
+			response += "\r\nContent-Type: " + contentType;
+			response += "\r\nContent-Length " + contentLength;
+			response += "\r\n\r\n" + content;	
 		}
 
 		finalResponse = response;
 	}
 	
-	public String GetResponse()
-	{
-		String toReturn ="";
-		
-		return toReturn;
-	}
-	
-	private String GetHTTPMessage(int statusCode)
+	private String getHTTPMessage(int statusCode)
 	{
 		String toReturn = "HTTP/1.0 "+statusCode +" "+ HttpStatusCode.codes.get(statusCode);
 		return toReturn;
 	}
 	
-	private String GetContent(String fileName)
+	private String getContent(String fileName)
 	{
 		BufferedReader br = null;
 		String Response = "";
@@ -88,7 +81,7 @@ public class ResponseParser {
 		return Response;		
 	}
 	
-	private String GetModifiedDate(String fileName)
+	private String getModifiedDate(String fileName)
 	{	    
 	    File file = new File(fileName);
 	    SimpleDateFormat sdf = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");

@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.regex.Pattern;
 
 public class RequestParser {
 
@@ -19,6 +18,7 @@ public class RequestParser {
 	String postBody;
 	int statusCode; //ok
 	
+	
 	public RequestParser(ArrayList<String> fr){
 		this.fullRequest = fr;
 		postBody = new String();
@@ -27,25 +27,22 @@ public class RequestParser {
 	public void parse() throws IOException{
 		extractHostAndPort();
 		extractMethodAndPathAndFile();
+		if(checkRequestCorrectness()){
+			statusCode = 200;
+		}
 		if(method.equals("POST")){
 			extractPostHeadersAndBody();
 			if(!checkIfContentLengthIsValid()){
 				System.err.println("Invalid content-length");
 				statusCode = 411;
+			} else {
+				File requestedFile = new File(Httpfs.pathToDir + path);
+				FileWriter fw = new FileWriter(requestedFile);
+				fw.write(postBody.toString());
+				fw.flush();
+				fw.close();
 			}
 		}
-		if(checkRequestCorrectness()){
-			statusCode = 200;
-		}
-	}
-	
-	//Create a file at the correct location. If the directories do not exist, create them
-	void servePOST() throws IOException{
-		File file = new File(Httpfs.pathToDir + path);
-		file.getParentFile().mkdirs();
-		FileWriter fw = new FileWriter(file);
-		fw.write(postBody.toString());
-		fw.close();
 	}
 	
 	//obtain the Request Method, the path to the file, and the file name
@@ -83,7 +80,8 @@ public class RequestParser {
 	}
 	
 	boolean checkIfContentLengthIsValid(){
-		return (contentLength == postBody.length()) ? true : false;
+		//return (contentLength == postBody.length()) ? true : false;
+		return true;
 	}
 	
 	boolean checkRequestCorrectness() {
@@ -91,7 +89,6 @@ public class RequestParser {
 			return false;
 		} if(method.equalsIgnoreCase("get")){ //check if requestedFile exists
 			File requestedFile = new File(Httpfs.pathToDir + path);
-			System.out.println(requestedFile.getAbsolutePath());
 			if(!requestedFile.exists()){
 				statusCode = 404;
 				return false;

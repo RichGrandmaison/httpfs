@@ -2,12 +2,14 @@ package httpfs;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+
 
 public class Httpfs {
 	
@@ -34,23 +36,15 @@ public class Httpfs {
 			System.out.println("New connection accepted ...");
 			
 			BufferedReader request = new BufferedReader(
-					new InputStreamReader(clientSocket.getInputStream())); 
+					new InputStreamReader(clientSocket.getInputStream()));
 			PrintWriter response = new PrintWriter(new BufferedWriter(
 					new OutputStreamWriter(clientSocket.getOutputStream())),true);
-			
-			String requestLine;
+		
 			ArrayList<String> fullRequest = new ArrayList<String>();
+
 			int contentLength = -1;
 			final String contentLengthString = "Content-Length: ";
-			/*
-			while((requestLine = request.readLine()) != null){
-				System.err.println(requestLine);
-				fullRequest.add(requestLine);
-				if(requestLine.isEmpty())
-				{
-					break;
-				}
-			}*/
+		
 			while(true){
 				requestLine = request.readLine();
 				System.err.println(requestLine);
@@ -69,10 +63,13 @@ public class Httpfs {
 			System.err.println(postContent);
 			fullRequest.add(new String(postContent));
 			
-			
 			RequestParser rp = new RequestParser(fullRequest);
 			rp.parse();
-			rp.DisplayParsedRequest();
+			//rp.DisplayParsedRequest();
+			
+			ResponseParser responseParser = new ResponseParser(rp);
+			response.print(responseParser.finalResponse);
+			response.flush();
 
 			//close all
 			
