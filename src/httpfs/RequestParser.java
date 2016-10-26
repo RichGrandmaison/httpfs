@@ -10,7 +10,6 @@ public class RequestParser {
 	ArrayList<String> fullRequest;
 	String method;
 	String path;
-	String file;
 	String host;
 	int port;
 	int contentLength;
@@ -53,8 +52,6 @@ public class RequestParser {
 		String[] firstLine = fullRequest.get(0).split(" ", 3);
 		method = firstLine[0].toUpperCase();
 		path = firstLine[1];
-		String[] extractFile = path.split("/");
-		file = extractFile[extractFile.length - 1];
 	}
 	
 	//obtain the host name, and if it port number is specified, capture it.
@@ -112,7 +109,6 @@ public class RequestParser {
 		System.out.println("Method: " + method);
 		System.out.println("Path: " + path);
 		System.out.println("Host: " + host);
-		System.out.println("File " + file);
 		System.out.println("Port " + port);
 		System.out.println("Content-Length: " + contentLength);
 		System.out.println("Content-Type: " + contentType);
