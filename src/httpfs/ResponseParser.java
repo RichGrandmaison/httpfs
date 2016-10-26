@@ -51,10 +51,10 @@ public class ResponseParser {
 				if(dir.exists() && dir.isDirectory()){
 					File[] filesInDir = dir.listFiles();
 					for(File f : filesInDir){
-						if(f.isFile()){
+						//if(f.isFile()){
 							files.add(f.getName() + "\r\n");
 							filesLength += f.getName().length();
-						}
+						//}
 					}
 				}
 				response += "\r\nMIME-version: 1.0";

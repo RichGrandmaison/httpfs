@@ -16,7 +16,7 @@ public class Httpfs {
 	//Default values attributed directly.
 	static int port = 8080;
 	static boolean debugMessages = false;
-	static String pathToDir = new File("").getAbsolutePath();
+	static String pathToDir = new File("data").getAbsolutePath();
 	static ServerSocket serverSocket;
 
 	public static void main(String[] args) throws Exception {
