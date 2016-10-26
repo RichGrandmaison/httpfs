@@ -17,9 +17,18 @@ public class ResponseParser {
 	private String content;
 	private String dateNow;
 	private String modifiedDate;
-	private String server = "Rich&Simon =D v1";
+	private static String server = "Rich&Simon =D v1";
 	public String finalResponse;
 
+	public static String ErrorMessage(int statusCode)
+	{
+		String response = "";
+		response += getHTTPMessage(statusCode) + "\r\n";
+		response += "Date: " + new Date().toString();
+		response += "\r\nServer: " + server;
+		return response;
+	}
+	
 	public ResponseParser(RequestParser r)
 	{
 		rp = r;
@@ -71,7 +80,7 @@ public class ResponseParser {
 		finalResponse = response;
 	}
 
-	private String getHTTPMessage(int statusCode)
+	private static String getHTTPMessage(int statusCode)
 	{
 		String toReturn = "HTTP/1.0 "+statusCode +" "+ HttpStatusCode.codes.get(statusCode);
 		return toReturn;
