@@ -25,7 +25,7 @@ public class CommandLineParser {
 			argsLength--;
 		}
 		if(args.contains(PATHTODIR)){
-			Httpfs.pathToDir = Httpfs.pathToDir + args.get(args.indexOf(PATHTODIR) + 1).replace("/", "\\");
+			Httpfs.pathToDir = args.get(args.indexOf(PATHTODIR) + 1).replace("/", "\\");
 			boolean requestedPath = new File(Httpfs.pathToDir).mkdirs();
 			argsLength -= 2;	
 		}
