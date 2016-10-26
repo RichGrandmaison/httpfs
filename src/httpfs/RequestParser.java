@@ -16,13 +16,13 @@ public class RequestParser {
 	String contentType;
 	String postBody;
 	int statusCode; //ok
-	
-	
+
+
 	public RequestParser(ArrayList<String> fr){
 		this.fullRequest = fr;
 		postBody = new String();
 	}
-	
+
 	public void parse() throws IOException{
 		extractHostAndPort();
 		extractMethodAndPathAndFile();
@@ -36,24 +36,29 @@ public class RequestParser {
 				statusCode = 411;
 			} else {
 				File requestedFile = new File(Httpfs.pathToDir + path);
-				if(!requestedFile.exists()){
+				if(requestedFile.getPath().equals(Httpfs.pathToDir)){
+					statusCode = 403;
+				}else if(!requestedFile.exists()){
 					requestedFile.getParentFile().mkdirs();
+				} 
+
+				if(statusCode != 403){
+					FileWriter fw = new FileWriter(requestedFile);
+					fw.write(postBody.toString());
+					fw.flush();
+					fw.close();
 				}
-				FileWriter fw = new FileWriter(requestedFile);
-				fw.write(postBody.toString());
-				fw.flush();
-				fw.close();
 			}
 		}
 	}
-	
+
 	//obtain the Request Method, the path to the file, and the file name
 	void extractMethodAndPathAndFile() {
 		String[] firstLine = fullRequest.get(0).split(" ", 3);
 		method = firstLine[0].toUpperCase();
 		path = firstLine[1];
 	}
-	
+
 	//obtain the host name, and if it port number is specified, capture it.
 	void extractHostAndPort() {
 		String[] fullHost = fullRequest.get(1).split(" ", 2);
@@ -63,10 +68,10 @@ public class RequestParser {
 			port = Integer.parseInt(splitHost[1]);
 		else port = Httpfs.port;
 	}
-	
+
 	//obtain the headers and the body associated with a POST request
 	void extractPostHeadersAndBody(){
-		
+
 		for(String requestLine : fullRequest){
 			if(requestLine.startsWith("Content-Length")){
 				String[] temp = requestLine.split(": ");
@@ -78,12 +83,12 @@ public class RequestParser {
 		}
 		postBody = fullRequest.get(fullRequest.size() - 1);
 	}
-	
+
 	boolean checkIfContentLengthIsValid(){
 		//return (contentLength == postBody.length()) ? true : false;
 		return true;
 	}
-	
+
 	boolean checkRequestCorrectness() {
 		if(!(method.equalsIgnoreCase("post") || method.equalsIgnoreCase("get"))){
 			return false;
@@ -99,11 +104,11 @@ public class RequestParser {
 				statusCode = 404;
 				return false;
 			}
-				
+
 		} 
 		return true;
 	}
-	
+
 	//Only for testing purposes
 	public void DisplayParsedRequest(){
 		System.out.println("Method: " + method);
