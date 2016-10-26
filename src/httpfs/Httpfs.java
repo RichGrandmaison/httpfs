@@ -32,6 +32,7 @@ public class Httpfs {
 		
 		//wait for connections
 		while(true){
+			
 			Socket clientSocket = serverSocket.accept();
 			ConnectionHandler c = new ConnectionHandler(clientSocket);
 			c.start();

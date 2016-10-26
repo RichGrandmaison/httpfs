@@ -59,22 +59,27 @@ public class ConnectionHandler extends Thread{
 				final char[] postContent = new char[contentLength];
 				request.read(postContent);
 				fullRequest.add(new String(postContent));
-			}	
+			}
+			
+			
 			
 			//Class called to format and parse the request
 			RequestParser rp = new RequestParser(fullRequest);
 			rp.parse();
 			
-			if(Httpfs.debugMessages){
-				System.out.println("Full request: "+fullRequest);
-				System.out.println("Status code: "+rp.statusCode);
-				System.out.println("Returning appropriate response");
-			}			
-
 			//Class called to format the response
 			ResponseParser responseParser = new ResponseParser(rp);
 			response.print(responseParser.finalResponse);
 			response.flush();
+			
+			if(Httpfs.debugMessages){
+				System.out.println("Full request: ");
+				for(String r : fullRequest){
+					System.out.println(r);
+				}
+				System.out.println("Full response:");
+				System.out.println(responseParser.finalResponse);
+			}			
 	
 			//close all
 			request.close();
@@ -88,7 +93,7 @@ public class ConnectionHandler extends Thread{
 		finally{
 			if(Httpfs.debugMessages)
 			{
-				System.out.println("Connection closed");
+				System.out.println("Connection closed...\n");
 			}
 		}
 	}
