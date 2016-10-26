@@ -26,6 +26,7 @@ public class Httpfs {
 		ServerSocket serverSocket = new ServerSocket(port);
 
 		System.out.println("HTTPFS now listening on port " + port + " ...");
+		System.out.println("HTTPFS directory set to " + pathToDir);
 		if(debugMessages){
 			System.out.println("Debug messages will be printed ...");
 		}
