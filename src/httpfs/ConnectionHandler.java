@@ -34,6 +34,7 @@ public class ConnectionHandler extends Thread{
 		}
 	}
 	
+	@Override
 	public void run() 
 	{
 		try{				
@@ -80,7 +81,7 @@ public class ConnectionHandler extends Thread{
 				System.out.println(responseParser.finalResponse);
 			}	
 			
-			//response.flush();
+			response.flush();
 	
 			//close all
 			request.close();

@@ -27,7 +27,7 @@ public class ResponseParser {
 		response.append("\r\nServer: " + server);
 		return response;
 	}
-	
+
 	public ResponseParser(RequestParser r)
 	{
 		httpHeader = getHTTPMessage(r.statusCode);
@@ -43,20 +43,21 @@ public class ResponseParser {
 		if(r.method.equals("GET"))
 		{	
 			content = new StringBuilder();
-			
+
 			if(r.path.length() > 1){
-				String temp = getContent(Httpfs.pathToDir + r.path);
+				System.out.println(Httpfs.pathToDir);
+				System.out.println((Httpfs.pathToDir + r.path).replace('/', '\\'));
+				String temp = getContent((Httpfs.pathToDir + r.path).replace('/', '\\'));
 				content.append(temp);
 				contentLength = content.length();
 			} else {
 				File dir = new File(Httpfs.pathToDir);
 				ArrayList<String> files = new ArrayList<String>();
 				contentLength = 0;
-				files.add("Available files...\r\n");
-				files.add("/\r\n");
-				
+				files.add("root/\r\n");
+
 				if(dir.isDirectory()){
-					getFileList(dir, files);
+					getFileList(dir, files,0);
 				}
 				for(String file : files){
 					if(file != null){
@@ -64,37 +65,44 @@ public class ResponseParser {
 					}
 				}
 			}
-			
+
 			response.append("\r\nMIME-version: 1.0");
 			response.append("\r\nLast-Modified: " + modifiedDate);
 			response.append("\r\nContent-Type: " + contentType);
 			response.append("\r\nContent-Length " + contentLength);
 			response.append("\r\n\r\n");
-			response.append(content);
+			response.append(content.toString());
 		}
 
 		finalResponse = response.toString();
 	}
 
-	private void getFileList(File dir, ArrayList<String> files) {
-		
-		File[] filesInDir = dir.listFiles();
-		
-		for(File f : filesInDir){
-			if(f.isFile()){
-				files.add(f.getName() + "\r\n");
-				contentLength += f.getName().length() + 3;
+	private void getFileList(File dir, ArrayList<String> files, int level) {
+
+		if(dir.isDirectory()){
+			File[] filesInDir = dir.listFiles();
+			StringBuilder filePad = new StringBuilder();
+
+			for(int i = 0; i < level; i++){
+				filePad.append("-");
+			}
+
+			for(File f : filesInDir){
+				if(f.isFile()){
+					files.add(filePad + "-" + f.getName() + "\r\n");
+					contentLength += f.getName().length() + 3;
+				}
+			}
+			for(File f : filesInDir){
+				if(f.isDirectory()){
+					files.add(filePad + "/" + f.getName() + "\r\n");
+					contentLength += f.getName().length() + 1;
+					File insidePath = new File(Httpfs.pathToDir + "/" + f.getName());
+					getFileList(insidePath, files, level + 1);
+				}
 			}
 		}
-		for(File f : filesInDir){
-			if(f.isDirectory()){
-				files.add("/" + f.getName() + "\r\n");
-				contentLength += f.getName().length() + 1;
-				File insidePath = new File(Httpfs.pathToDir + "/" + f.getName());
-				getFileList(insidePath, files);
-			}
-		}
-		
+
 	}
 
 	private static String getHTTPMessage(int statusCode)
