@@ -10,74 +10,91 @@ import java.util.Date;
 
 public class ResponseParser {
 
-	private RequestParser rp;
 	private int contentLength;
 	private String httpHeader;
 	private String contentType = "text/plain";
-	private String content;
+	private StringBuilder content;
 	private String dateNow;
 	private String modifiedDate;
 	private static String server = "Rich&Simon =D v1";
 	public String finalResponse;
 
-	public static String ErrorMessage(int statusCode)
+	public static StringBuilder errorMessage(int statusCode)
 	{
-		String response = "";
-		response += getHTTPMessage(statusCode) + "\r\n";
-		response += "Date: " + new Date().toString();
-		response += "\r\nServer: " + server;
+		StringBuilder response = new StringBuilder();
+		response.append(getHTTPMessage(statusCode) + "\r\n");
+		response.append("Date: " + new Date().toString());
+		response.append("\r\nServer: " + server);
 		return response;
 	}
 	
 	public ResponseParser(RequestParser r)
 	{
-		rp = r;
 		httpHeader = getHTTPMessage(r.statusCode);
 
 		dateNow = new Date().toString();
 		modifiedDate = getModifiedDate(Httpfs.pathToDir + r.path);		
 
-		String response = "";
-		response += httpHeader + "\r\n";
-		response += "Date: " + dateNow;
-		response += "\r\nServer: " + server;
+		StringBuilder response = new StringBuilder();
+		response.append(httpHeader + "\r\n");
+		response.append("Date: " + dateNow);
+		response.append("\r\nServer: " + server);
 
 		if(r.method.equals("GET"))
 		{	
+			content = new StringBuilder();
+			
 			if(r.path.length() > 1){
-				content = getContent(Httpfs.pathToDir + r.path);
+				String temp = getContent(Httpfs.pathToDir + r.path);
+				content.append(temp);
 				contentLength = content.length();
-				response += "\r\nMIME-version: 1.0";
-				response += "\r\nLast-Modified: " + modifiedDate;
-				response += "\r\nContent-Type: " + contentType;
-				response += "\r\nContent-Length " + contentLength;
-				response += "\r\n\r\n" + content;	
 			} else {
 				File dir = new File(Httpfs.pathToDir);
 				ArrayList<String> files = new ArrayList<String>();
-				int filesLength = 0;
+				contentLength = 0;
+				files.add("Available files...\r\n");
+				files.add("/\r\n");
 				
-				if(dir.exists() && dir.isDirectory()){
-					File[] filesInDir = dir.listFiles();
-					for(File f : filesInDir){
-						//if(f.isFile()){
-							files.add(f.getName() + "\r\n");
-							filesLength += f.getName().length();
-						//}
+				if(dir.isDirectory()){
+					getFileList(dir, files);
+				}
+				for(String file : files){
+					if(file != null){
+						content.append(file);
 					}
 				}
-				response += "\r\nMIME-version: 1.0";
-				response += "\r\nLast-Modified: " + modifiedDate;
-				response += "\r\nContent-Type: " + contentType;
-				response += "\r\nContent-Length " + filesLength;
-				response += "\r\n\r\n";
-				for(String file : files){
-					response += file;
-				}
 			}
+			
+			response.append("\r\nMIME-version: 1.0");
+			response.append("\r\nLast-Modified: " + modifiedDate);
+			response.append("\r\nContent-Type: " + contentType);
+			response.append("\r\nContent-Length " + contentLength);
+			response.append("\r\n\r\n");
+			response.append(content);
 		}
 
-		finalResponse = response;
+		finalResponse = response.toString();
+	}
+
+	private void getFileList(File dir, ArrayList<String> files) {
+		
+		File[] filesInDir = dir.listFiles();
+		
+		for(File f : filesInDir){
+			if(f.isFile()){
+				files.add(f.getName() + "\r\n");
+				contentLength += f.getName().length() + 3;
+			}
+		}
+		for(File f : filesInDir){
+			if(f.isDirectory()){
+				files.add("/" + f.getName() + "\r\n");
+				contentLength += f.getName().length() + 1;
+				File insidePath = new File(Httpfs.pathToDir + "/" + f.getName());
+				getFileList(insidePath, files);
+			}
+		}
+		
 	}
 
 	private static String getHTTPMessage(int statusCode)

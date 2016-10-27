@@ -17,7 +17,6 @@ public class RequestParser {
 	String postBody;
 	int statusCode; //ok
 
-
 	public RequestParser(ArrayList<String> fr){
 		this.fullRequest = fr;
 		postBody = new String();

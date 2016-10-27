@@ -70,7 +70,6 @@ public class ConnectionHandler extends Thread{
 			//Class called to format the response
 			ResponseParser responseParser = new ResponseParser(rp);
 			response.print(responseParser.finalResponse);
-			response.flush();
 			
 			if(Httpfs.debugMessages){
 				System.out.println("Full request: ");
@@ -79,7 +78,9 @@ public class ConnectionHandler extends Thread{
 				}
 				System.out.println("Full response:");
 				System.out.println(responseParser.finalResponse);
-			}			
+			}	
+			
+			//response.flush();
 	
 			//close all
 			request.close();
@@ -88,7 +89,7 @@ public class ConnectionHandler extends Thread{
 		}
 		catch(Exception e)
 		{//if we are here, something went wrong therefore we are returning error 500			
-			response.print(ResponseParser.ErrorMessage(500));
+			response.print(ResponseParser.errorMessage(500));
 		}
 		finally{
 			if(Httpfs.debugMessages)
