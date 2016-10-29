@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.concurrent.Semaphore;
 
 public class ResponseParser {
 
@@ -18,7 +19,10 @@ public class ResponseParser {
 	private String modifiedDate;
 	private static String server = "Rich&Simon =D v1";
 	public String finalResponse;
-
+	public static Semaphore read = new Semaphore(0);
+	static int readCount = 0;
+	public static Semaphore write = new Semaphore(0);
+	
 	public static StringBuilder errorMessage(int statusCode)
 	{
 		StringBuilder response = new StringBuilder();
@@ -39,11 +43,12 @@ public class ResponseParser {
 		response.append(httpHeader + "\r\n");
 		response.append("Date: " + dateNow);
 		response.append("\r\nServer: " + server);
-
+		response.append("\r\nMIME-version: 1.0");
+		response.append("\r\nLast-Modified: " + modifiedDate);
+		
 		if(r.method.equals("GET"))
 		{	
 			content = new StringBuilder();
-
 			if(r.path.length() > 1){
 				System.out.println(Httpfs.pathToDir);
 				System.out.println((Httpfs.pathToDir + r.path).replace('/', '\\'));
@@ -55,7 +60,6 @@ public class ResponseParser {
 				ArrayList<String> files = new ArrayList<String>();
 				contentLength = 0;
 				files.add("root/\r\n");
-
 				if(dir.isDirectory()){
 					getFileList(dir, files,0);
 				}
@@ -65,9 +69,6 @@ public class ResponseParser {
 					}
 				}
 			}
-
-			response.append("\r\nMIME-version: 1.0");
-			response.append("\r\nLast-Modified: " + modifiedDate);
 			response.append("\r\nContent-Type: " + contentType);
 			response.append("\r\nContent-Length " + contentLength);
 			response.append("\r\n\r\n");
@@ -97,7 +98,7 @@ public class ResponseParser {
 				if(f.isDirectory()){
 					files.add(filePad + "/" + f.getName() + "\r\n");
 					contentLength += f.getName().length() + 1;
-					File insidePath = new File(Httpfs.pathToDir + "/" + f.getName());
+					File insidePath = new File(dir + "/" + f.getName());
 					getFileList(insidePath, files, level + 1);
 				}
 			}
@@ -122,11 +123,17 @@ public class ResponseParser {
 
 			br = new BufferedReader(new FileReader(fileName));
 
+			read.tryAcquire();
+			readCount++;
+			read.release();
 			while ((sCurrentLine = br.readLine()) != null) {
 				Response += sCurrentLine;
 				Response += "\n";
 			}
-
+			read.tryAcquire();
+			readCount--;
+			read.release();
+				
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {

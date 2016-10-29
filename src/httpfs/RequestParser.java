@@ -43,14 +43,25 @@ public class RequestParser {
 
 				if(statusCode != 403){
 					FileWriter fw = new FileWriter(requestedFile);
-					fw.write(postBody.toString());
-					fw.flush();
-					fw.close();
-				}
+					
+					ResponseParser.write.tryAcquire();
+					while(true)
+					{
+						ResponseParser.read.tryAcquire();
+						if(ResponseParser.readCount == 0)
+						{
+							fw.write(postBody.toString());
+							fw.flush();
+							fw.close();
+							ResponseParser.write.release();
+						}
+						ResponseParser.read.release();
+						break;
+					}
 			}
 		}
 	}
-
+	}
 	//obtain the Request Method, the path to the file, and the file name
 	void extractMethodAndPathAndFile() {
 		String[] firstLine = fullRequest.get(0).split(" ", 3);

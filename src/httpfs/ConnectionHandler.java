@@ -34,7 +34,7 @@ public class ConnectionHandler extends Thread{
 		}
 	}
 	
-	@Override
+	
 	public void run() 
 	{
 		try{				
@@ -61,13 +61,11 @@ public class ConnectionHandler extends Thread{
 				request.read(postContent);
 				fullRequest.add(new String(postContent));
 			}
-			
-			
-			
+	
 			//Class called to format and parse the request
 			RequestParser rp = new RequestParser(fullRequest);
 			rp.parse();
-			
+
 			//Class called to format the response
 			ResponseParser responseParser = new ResponseParser(rp);
 			response.print(responseParser.finalResponse);
@@ -80,21 +78,17 @@ public class ConnectionHandler extends Thread{
 				System.out.println("Full response:");
 				System.out.println(responseParser.finalResponse);
 			}	
-			
-			response.flush();
-	
-			//close all
-			request.close();
-			response.close();
-			clientSocket.close();
 		}
 		catch(Exception e)
 		{//if we are here, something went wrong therefore we are returning error 500			
 			response.print(ResponseParser.errorMessage(500));
 		}
 		finally{
+			//Closing socket
+			response.flush();
+			response.close();
 			if(Httpfs.debugMessages)
-			{
+			{	
 				System.out.println("Connection closed...\n");
 			}
 		}
